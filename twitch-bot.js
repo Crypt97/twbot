@@ -20,7 +20,7 @@ const TWITCH_USERNAME = 'CHANGE_ME'; // Ide írd a saját Twitch felhasználóne
 const TWITCH_OAUTH_TOKEN = 'oauth:CHANGE_ME'; 
 
 // Gemini API konfiguráció
-const GEMINI_API_KEY = 'AIzaSyC0nXF6IsWnhivsx17LJSeie6cSysoWU70';
+const GEMINI_API_KEY = 'CHANGE_ME';
 const GEMINI_MODEL = 'gemini-2.0-flash'; // Gemini 2.0 Flash modell
 
 // Wikipedia API beállítások
