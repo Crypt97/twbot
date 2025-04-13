@@ -25,6 +25,14 @@ const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 // A tulajdonos felhasználóneve, aki leállíthatja a botot
 const OWNER_USERNAME = TWITCH_USERNAME.toLowerCase();
 
+// További admin felhasználók, akik parancsokat adhatnak a botnak
+const ADMIN_USERS = ['YOUR DISCORD NAME, username no Username'];
+
+// Függvény a felhasználó jogosultságainak ellenőrzéséhez
+function isAuthorized(username) {
+  return username === OWNER_USERNAME || ADMIN_USERS.includes(username);
+}
+
 // Bot beállítások
 let welcomeEnabled = false; // Alapértelmezetten kikapcsolt köszöntés
 const COMMAND_PREFIX = '!'; // Parancs előtag
@@ -191,7 +199,7 @@ client.on('message', async (channel, tags, message, self) => {
     const command = args.shift().toLowerCase();
     
     // Welcome parancs kezelése - csak a tulajdonos állíthatja be
-    if (command === WELCOME_TOGGLE_COMMAND && username === OWNER_USERNAME) {
+    if (command === WELCOME_TOGGLE_COMMAND && isAuthorized(username)) {
       welcomeEnabled = !welcomeEnabled;
       client.say(channel, `@${tags.username}, az új felhasználók köszöntése ${welcomeEnabled ? 'bekapcsolva' : 'kikapcsolva'}.`);
       console.log(`Köszöntés állapota megváltoztatva: ${welcomeEnabled ? 'BE' : 'KI'}`);
@@ -222,7 +230,7 @@ client.on('message', async (channel, tags, message, self) => {
   }
   
   // Bot leállítása chat paranccsal - csak a tulajdonos állíthatja le
-  if (message.toLowerCase() === '!stopbot' && username === OWNER_USERNAME) {
+  if (message.toLowerCase() === '!stopbot' && isAuthorized(username)) {
     console.log('Bot leállítás parancs fogadva a tulajdonostól!');
     client.say(channel, `Bot leállítása...`);
     
@@ -274,9 +282,9 @@ client.on('connected', async (addr, port) => {
   console.log(`* Bejelentkezve mint: ${TWITCH_USERNAME}`);
   console.log('* A bot leállítható:');
   console.log('  - A terminálban: Nyomj Ctrl+C vagy írd be: "exit" és nyomj Enter-t');
-  console.log(`  - A Twitch chatben: Írd be: !stopbot (csak ${OWNER_USERNAME} felhasználó használhatja)`);
+  console.log(`  - A Twitch chatben: Írd be: !stopbot (${OWNER_USERNAME} és ${ADMIN_USERS.join(', ')} használhatja)`);
   console.log(`* Új felhasználók köszöntése: ${welcomeEnabled ? 'BEKAPCSOLVA' : 'KIKAPCSOLVA'}`);
-  console.log(`* A köszöntés ki/be kapcsolásához használd: !${WELCOME_TOGGLE_COMMAND} (csak ${OWNER_USERNAME} felhasználó használhatja)`);
+  console.log(`* A köszöntés ki/be kapcsolásához használd: !${WELCOME_TOGGLE_COMMAND} (${OWNER_USERNAME} és ${ADMIN_USERS.join(', ')} használhatja)`);
   console.log('* AI funkciók aktiválva: A felhasználók kérdezhetnek a bottól "!ask kérdés" formában vagy a bot nevének említésével');
   
   console.log('* Groq API tesztelése...');
