@@ -5,6 +5,7 @@
 Ez a program egy egyszerű Twitch chat bot, amely a következőket tudja:
 - AI segítségével válaszol a felhasználók kérdéseire
 - Üdvözli az új chat felhasználókat (opcionálisan)
+- Találós kérdés játékot vezethet a csatornán
 - Egyszerű parancsokkal irányítható
 
 ## Rendszerkövetelmények
@@ -48,20 +49,20 @@ Mielőtt először elindítanád a botot, be kell állítanod a Twitch felhaszn�
    - Nyisd meg a `twitch-bot.js` fájlt egy szövegszerkesztővel (pl. Jegyzettömb vagy VS Code)
    - Keresd meg ezeket a sorokat (kb. a 12-13. sorban):
      ```javascript
-     const TWITCH_USERNAME = 'CHANGE ME'; // Ide írd a saját Twitch felhasználónevedet
-     const TWITCH_OAUTH_TOKEN = 'oauth:CHANGE ME'; // Az OAuth token
+     const TWITCH_USERNAME = 'CHANGE_ME'; // Ide írd a saját Twitch felhasználónevedet
+     const TWITCH_OAUTH_TOKEN = 'oauth:CHANGE_ME'; // Az OAuth token
      ```
-   - Cseréld ki a `'CHANGE ME'` értéket a saját Twitch felhasználónevedre
-   - Cseréld ki a `'oauth:CHANGE ME'` értéket a saját OAuth tokenedre
+   - Cseréld ki a `'CHANGE_ME'` értéket a saját Twitch felhasználónevedre
+   - Cseréld ki a `'oauth:CHANGE_ME'` értéket a saját OAuth tokenedre
 
-4. **Groq API kulcs beállítása** (opcionális, ha módosítani szeretnéd):
-   - A bot jelenleg tartalmaz egy beépített Groq API kulcsot
-   - Ha saját Groq API kulcsot szeretnél használni:
-     - Regisztrálj a [Groq](https://groq.com/) oldalon
-     - Szerezz egy API kulcsot
+4. **Google Gemini API kulcs beállítása** (opcionális, ha módosítani szeretnéd):
+   - A bot jelenleg tartalmaz egy beépített Google Gemini API kulcsot
+   - Ha saját Google Gemini API kulcsot szeretnél használni:
+     - Regisztrálj a [Google AI Studio](https://ai.google.dev/) oldalon
+     - Szerezz egy API kulcsot a Gemini modellekhez
      - Keresd meg ezt a sort a kódban:
        ```javascript
-       const GROQ_API_KEY = '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';
+       const GOOGLE_API_KEY = 'AIza...'; // A tényleges API kulcs rejtve van biztonsági okokból
        ```
      - Cseréld ki a meglévő kulcsot a sajátodra
 
@@ -98,6 +99,22 @@ A chatben bárki kérdezhet a bottól két módon:
 - `!ask [kérdés]` paranccsal (például: `!ask Mi az élet értelme?`)
 - A bot nevének említésével (például: `@cryptrip mi a véleményed erről?`)
 
+### Találós kérdés játék (ÚJ!)
+
+A chatben a bot találós kérdés játékot is tud vezetni:
+
+- **Játék indítása**: `!talaloskerdes` vagy `!találóskérdés` paranccsal (csak admin felhasználók indíthatják)
+- **Válaszadás**: `!valasz [tipped]` vagy `!válasz [tipped]` paranccsal (bárki válaszolhat)
+
+A játék menete:
+1. Az indítás után a bot generál egy találós kérdést
+2. A felhasználóknak 2 percük van megadni a helyes választ
+3. A válasz üzenet visszajelzést ad a hátralévő időről
+4. Egy felhasználó többször is próbálkozhat, a legutolsó tipp számít
+5. Az idő lejárta után a bot kiértékeli a válaszokat és kihirdeti az eredményt
+
+A bot felismeri a teljesen helyes és részben helyes válaszokat is, és ennek megfelelően értékeli a játékosokat.
+
 ### Bot leállítása
 
 A botot a következő módokon állíthatod le:
@@ -114,11 +131,25 @@ A botot a következő módokon állíthatod le:
 
 ### Az AI válaszok nem működnek
 - Ellenőrizd az internet kapcsolatot
-- Győződj meg róla, hogy a Groq API kulcs helyesen van beállítva a kódban
+- Győződj meg róla, hogy a Google Gemini API kulcs helyesen van beállítva a kódban
+- Ellenőrizd a Google AI Platform státuszát is, hogy nincs-e esetleg szolgáltatás-kiesés
 
 ### Hibák értelmezése
 - A konzolon megjelenő hibaüzenetek segítenek azonosítani a problémákat
 - "API válasz hiba" üzenet általában az AI szolgáltatással kapcsolatos problémát jelez
+
+### A bot üzenetei nem jelennek meg vagy hibaként jelennek meg
+
+- A Twitch korlátozza a gyors egymás utáni üzenetküldéseket
+- Az új verzió automatikusan késlelteti az üzeneteket az anti-spam védelem elkerüléséhez
+- Ha mégis problémát észlelsz, próbáld növelni a késleltetést a kódban a MESSAGE_DELAY értéket módosítva
+
+## Legutóbbi frissítések
+
+### 2025. április 13-i frissítés
+- **Találós kérdés játék fejlesztése**: A játék most már pontosan számolja és kijelzi a hátralévő időt másodperc pontossággal
+- **Anti-flood védelem**: Üzenetek késleltetett küldése a Twitch spam szűrő elkerüléséhez
+- **Felhasználói élmény javítása**: Kevesebb felesleges üzenet a chatben, amikor már csak kevés idő van hátra
 
 ## Értesítések és engedélyek
 
@@ -129,5 +160,6 @@ Mivel ez egy egyszerű script, bizonyos biztonsági figyelmeztetések megjelenhe
 Ez a bot Node.js alapú, és a következő könyvtárakat használja:
 - tmi.js: Twitch üzenetkezeléshez
 - node-fetch: API kérésekhez
+- @google/generative-ai: Google Gemini API használatához
 
-Az AI válaszokat a Groq API biztosítja, ami a llama3-70b modellt használja.
+Az AI válaszokat a Google Gemini API biztosítja, a gemini-2.0-flash modell használatával.
